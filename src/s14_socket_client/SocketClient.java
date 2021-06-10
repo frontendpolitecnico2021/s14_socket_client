@@ -14,9 +14,15 @@ import java.util.Scanner;
  * SocketClient --- Programa que actua como terminal o cliente socket para
  * peticiones del Banco Politécnico.
  * 
- * @author SubGrupo 16 - Persistencia de Datos
+ * @author Martinez Alzate John Alejandro
+ * @author Norena Arenas Yeferson Eduardo
+ * @author Ortiz Gutierrez Raul Enrique
+ * @author Salazar Gallego Kevin De Jesus
+ * @author Fajardo Barragan Leidy Marcela
+ * 
  * 
  */
+
 
 public class SocketClient {
 
@@ -55,6 +61,11 @@ public class SocketClient {
 	public SocketClient() {
 		sn = new Scanner(System.in);
 	}// Cierra el constructor de la clase
+	
+	/**
+	 * Método main donde arranca la ejecución del programa
+	 * @param args -  Argumentos que puede recibir el programa
+	 * */
 
 	public static void main(String[] args) {	
 		
@@ -204,13 +215,17 @@ public class SocketClient {
 
 	}// Cierre de la clase getMenu()
 
-	/** Método para obtener el mensaje de información */
+	/** Método para obtener el mensaje de información 
+	 * @return msg - Retorna un mensaje
+	 * */
 
 	public String getMsg() {
 		return msg;
 	}
 
-	/** Método para establecer el mensaje de información */
+	/** Método para establecer el mensaje de información 
+	 * @param msg - Recibe un mensaje 
+	 * */
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
