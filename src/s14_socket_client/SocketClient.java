@@ -2,7 +2,6 @@ package s14_socket_client;
 
 import java.io.DataInputStream;
 
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,58 +10,87 @@ import java.net.Socket;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/**
+ * SocketClient --- Programa que actua como terminal o cliente socket para
+ * peticiones del Banco Polit茅cnico.
+ * 
+ * @author SubGrupo 16 - Persistencia de Datos
+ * 
+ */
+
 public class SocketClient {
 
-	Scanner sn = null;
-	static String SERVERNAME = "localhost";
-	static int PORT = 3000;
-	Socket client = null;
-	static String RETIRO = "Retiro de Dinero";
-	static String CONSULTA = "Consultar saldo";
-	static String SALIR = "Salir";
-	String msg;
+	/** Instancia de la clase Scanner para captura por consola */
+	private Scanner sn = null;
+	/** Ip del servidor de sockets para enviar peticiones */
+	private static String SERVERNAME = "localhost";
+
+	/** Puerto del servidor de sockets para enviar peticiones */
+	private static int PORT = 3000;
+
+	/** Instancia de la clase socket */
+	private Socket client = null;
+
+	/** Constante para definir el texto para retiros de dinero */
+	private static String RETIRO = "Retiro de Dinero";
+
+	/** Constante para definir el texto para consulta de saldos */
+	private static String CONSULTA = "Consultar saldo";
+
+	/** Constante para definir el texto para salir de la aplicaci贸n */
+	private static String SALIR = "Salir";
+
+	/** Propiedad para almacenar los mensajes de informaci贸n */
+	private String msg;
 	
+	
+	/** Instancia SocketClient */
+	 
+	private static SocketClient socketClient = null;
 	
 
+	/**
+	 * Constructor de la clase SocketClient
+	 */
 	public SocketClient() {
-
 		sn = new Scanner(System.in);
+	}// Cierra el constructor de la clase
 
-	}
-
-	public static void main(String[] args) {
-
-		SocketClient socketClient = new SocketClient();
+	public static void main(String[] args) {	
 		
+// Instancia de la clase SocketClient
+		socketClient = new SocketClient();
+
 		try {
 			// Obtiene la pantalla Inicial
-			socketClient.getPantallaInicial();	
-			
-			// Realiza la conexion al servidor transaccional
+			socketClient.getPantallaInicial();
+
+			// Realiza la conexion al servidor de sockets (transaccional) del banco Politecnico
 			socketClient.conectarServidorSocket();
-
+			
 			System.out.println("Escribe una de las opciones");
-
+			
+			// Limpia la consola para registrar la otras opciones
 			new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 
+			//  Obtiene la conexi贸n con el servidor de sockets
 			socketClient.client.getRemoteSocketAddress();
 
-			//System.out.println("Just connected to " + socketClient.client.getRemoteSocketAddress());
-
 			boolean salir = false;
-			int opcion = 0; // Guardarmos la opci髇 del usuario
+			int opcion = 0; // Guardarmos la opci贸n del usuario
 			String seleccion = "";
-			
 
 			while (!salir) {
 
-				socketClient.getMenu();
-				socketClient.setMsg("\t\tEscoja una opci髇 y presione \"ENTER\" para continuar ..."); 
+				socketClient.getMenu(); // Obtiene el texto del men煤
+				socketClient.setMsg("\t\tEscoja una opci贸n y presione \"ENTER\" para continuar ...");
 				System.out.println(socketClient.getMsg());
-				
+
 				try {
-					
+					 
 					opcion = socketClient.sn.nextInt();
+					
+					// De acuerdo a la opci贸n seleccionada almacena para ser enviada al servidor
 
 					switch (opcion) {
 					case 1:
@@ -73,37 +101,42 @@ public class SocketClient {
 						seleccion = "2. " + CONSULTA;
 						salir = true;
 						break;
-					case 3:	
-						salir = true;					
-						break;					
+					case 3:
+						salir = true;
+						break;
 					default:
-						System.out.println("Solo n鷐eros entre 1 y 3");
+						System.out.println("Solo n煤meros entre 1 y 3");
 					}
 				} catch (InputMismatchException e) {
-					System.out.println("Debes insertar un n鷐ero");
+					// Imprime error si no escoge un n煤mero
+					System.out.println("Debes insertar un n煤mero");
 					socketClient.sn.next();
 					salir = true;
 				}
 
 			}
-			
+
+			// Imprime la respuesta en el  servidor
 			OutputStream outToServer = socketClient.client.getOutputStream();
 			DataOutputStream out = new DataOutputStream(outToServer);
 
-			out.writeUTF("Se escoge la opci髇;  " + seleccion + " - " + socketClient.client.getLocalSocketAddress());
+			out.writeUTF("Se escoge la opci贸n;  " + seleccion + " - " + socketClient.client.getLocalSocketAddress());
 			InputStream inFromServer = socketClient.client.getInputStream();
 			DataInputStream in = new DataInputStream(inFromServer);
-
-			//System.out.println("Server says " + in.readUTF());
-		//	socketClient.client.close();
+		
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	}
+	}// Cierre del m茅todo main
 
+	
+	/**
+	 * Obtiene el texto de la pantalla inicial
+	 * */
+	
 	public void getPantallaInicial() {
 
 		String text = "\n\n\n\n\n";
@@ -114,61 +147,71 @@ public class SocketClient {
 		text += "\t\t******     BIENVENIDOS AL BANCO POLITECNICO     *******\n";
 		text += "\t\t******\t\t\t\t\t\t*******\n";
 		text += "\t\t******\t\t\t\t\t\t*******\n";
-		text += "\t\t*******************************************************\n\n\n";	
-	
-		System.out.println(text);		
-		setMsg("\t\tPresione \"ENTER\" para continuar ...");
-		
-		presioneTeclaEnter();
-		}
+		text += "\t\t*******************************************************\n\n\n";
 
-	public void presioneTeclaEnter(){
-		   System.out.println(getMsg());		 
-		   sn.nextLine();
-		}
-	
-	public void conectarServidorSocket() 
-	{
-		System.out.println("Connecting to " + SERVERNAME + " on port " + PORT);
+		System.out.println(text);
+		setMsg("\t\tPresione \"ENTER\" para continuar ...");
+		//Ejecuta el m茅todo enter
+		presioneTeclaEnter();
+	}// Cierre m茅todo getPantallaInicial
+
+	/**
+	 * M茅todo que permite aceptar la petici贸n	  
+	 * */
+	public void presioneTeclaEnter() {
+		System.out.println(getMsg());
+		sn.nextLine();
+	}
+
+	/**
+	 * M茅todo para conectar al servidor de socket del banco Politecnico
+	 * 
+	 * */
+	public void conectarServidorSocket() {
+		System.out.println("Conectando al servidor " + SERVERNAME + " en el puerto " + PORT);
 		try {
 			client = new Socket(SERVERNAME, PORT);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-	}
+
+	}// Cierra el m茅todo conectarServidorSocket
+
 	
+	/**
+	 * Obtiene el texto del menu
+	 * */
 	
-	
-	public void getMenu() 
-	{
-				String text = "";
-				text = "\n\n\n\n\n";
-				text += "\t\t*******************************************************\n";
-				text += "\t\t******\t\t\t\t\t\t*******\n";
-				text += "\t\t******           Menu Principal                 *******\n";
-				text += "\t\t******\t\t\t\t\t\t*******\n";
-				text += "\t\t*******************************************************\n";			
-				text += "\t\t******\t\t\t\t\t\t*******\n";				
-				text += "\t\t******\t\t\t\t\t\t*******\n";		
-				text += "\t\t******   1. " + RETIRO + "                    *******\n";
-				text += "\t\t******   2. " + CONSULTA + "                     *******\n";			
-				text += "\t\t******   3. " + SALIR + "                               *******\n";
-				text += "\t\t******\t\t\t\t\t\t*******\n";
-				text += "\t\t******\t\t\t\t\t\t*******\n";
-				text += "\t\t******\t\t\t\t\t\t*******\n";
-				text += "\t\t*******************************************************\n\n";			
-				System.out.println(text );
-				 
-		
-	}
-	
+	public void getMenu() {
+		String text = "";
+		text = "\n\n\n\n\n";
+		text += "\t\t*******************************************************\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t******           Menu Principal                 *******\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t*******************************************************\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t******   1. " + RETIRO + "                    *******\n";
+		text += "\t\t******   2. " + CONSULTA + "                     *******\n";
+		text += "\t\t******   3. " + SALIR + "                               *******\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t******\t\t\t\t\t\t*******\n";
+		text += "\t\t*******************************************************\n\n";
+		System.out.println(text);
+
+	}// Cierre de la clase getMenu()
+
+	/** M茅todo para obtener el mensaje de informaci贸n */
+
 	public String getMsg() {
 		return msg;
 	}
 
+	/** M茅todo para establecer el mensaje de informaci贸n */
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
-}
+}// Cierre de la clase SocketClient
